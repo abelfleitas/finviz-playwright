@@ -33,7 +33,7 @@ jobs:
         server_port: 587
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }} 
-        secure: true
+        secure: false
         ignore_cert: false
         subject: "Playwright Test Results CSV"
         body: "Adjunto se encuentra el archivo CSV con los resultados del Stock Screener."
