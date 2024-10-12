@@ -18,10 +18,11 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright
-      run: npm run test
-    - uses: actions/upload-artifact@v4
+      run: npm run start
+    - name: Upload CSV Results
+      uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+        name: results-csv
+        path: results.csv
+        retention-days: 30  
