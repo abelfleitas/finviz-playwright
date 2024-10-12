@@ -33,6 +33,7 @@ jobs:
         server_port: ${{ secrets.SMTPORT }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }} 
+        secure: true
         subject: "Playwright Test Results CSV"
         body: "Adjunto se encuentra el archivo CSV con los resultados del Stock Screener."
         to: ${{ secrets.TO }} 
