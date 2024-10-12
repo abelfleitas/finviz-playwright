@@ -13,30 +13,16 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    # - name: Install dependencies
-    #   run: npm install
-    # - name: Install Playwright Browsers
-    #   run: npx playwright install --with-deps
-    # - name: Run Playwright
-    #   run: npm run start
-    # - name: Upload CSV Results
-    #   uses: actions/upload-artifact@v4
-    #   if: ${{ !cancelled() }}
-    #   with:
-    #     name: results-csv
-    #     path: results.csv
-    #     retention-days: 2  
-    - name: Send mail
-      uses: dawidd6/action-send-mail@v3  
+    - name: Install dependencies
+      run: npm install
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright
+      run: npm run start
+    - name: Upload CSV Results
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
       with:
-        server_address: ${{ secrets.SMTPHOST }}
-        server_port: 587
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }} 
-        secure: false
-        ignore_cert: false
-        subject: "Playwright Test Results CSV"
-        body: "Adjunto se encuentra el archivo CSV con los resultados del Stock Screener."
-        to: ${{ secrets.TO }} 
-        from: ${{ secrets.FROM }} 
-        #attachments: results.csv  
+        name: results-csv
+        path: results.csv
+        retention-days: 2  
