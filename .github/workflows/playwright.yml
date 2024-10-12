@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ main, master ]
 jobs:
-  test:
+  Finviz:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -25,4 +25,16 @@ jobs:
       with:
         name: results-csv
         path: results.csv
-        retention-days: 30  
+        retention-days: 2  
+    - name: Send mail
+      uses: dawidd6/action-send-mail@v3  
+      with:
+        server_address: ${{ secrets.SMTPHOST }}
+        server_port: ${{ secrets.SMTPORT }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }} 
+        subject: "Playwright Test Results CSV"
+        body: "Adjunto se encuentra el archivo CSV con los resultados del Stock Screener."
+        to: ${{ secrets.TO }} 
+        from: ${{ secrets.FROM }} 
+        attachments: results.csv  
