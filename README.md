@@ -14,14 +14,16 @@ Node.js and npm installed on your machine.
 ## Usage
 
 1. **Clone repository**:
+
 ```bash
    https://github.com/abelfleitas/finviz-playwright.git 
 
 ```
 
 2. **Install Dependencies**:
-   ```bash
+
+```bash
    npx playwright install
    npm install
    node index.js
- ```  
+ ```
