@@ -114,7 +114,11 @@ const csvWriter = createCsvWriter({
 
     await browser.close();
 
-    await csvWriter.writeRecords(results);
+    const sortedResults = results
+        .filter(item => parseFloat(item.iv) > parseFloat(item.price))
+        .sort((a, b) => parseFloat(b.iv) - parseFloat(a.iv));
+
+    await csvWriter.writeRecords(sortedResults);
 
 })();
 
