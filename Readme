@@ -5,7 +5,7 @@
 This script automates the extraction of financial data from stocks using the **Finviz** analysis tool. By using a browser controlled by code, the script collects relevant information from multiple companies that meet certain financial criteria, calculates key values based on this data, and filters the results to facilitate decision-making.
 
 ## Criteria 
-![Criteria](https://github.com/[abelfleitas]/[finviz-playwright]/blob/[main]/example.png?raw=true)
+![Criteria](https://github.com/abelfleitas/finviz-playwright/blob/main/example.png)
 
 
 ## Requirements
