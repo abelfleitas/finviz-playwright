@@ -44,8 +44,10 @@ const csvWriter = createCsvWriter({
     while (continuePaging) {
         const url = r === 1 ? symbolsUrl : `${symbolsUrl}&r=${r}`;
         await page.goto(url);
+        //await page.screenshot({ path: 'example.png' });
+
         const currentData = await extractDataFromPage(page);
-    
+        
         const hasDuplicates = currentData.some(symbol => allData.has(symbol));
         
         if (hasDuplicates) {
@@ -115,8 +117,8 @@ const csvWriter = createCsvWriter({
     await browser.close();
 
     const sortedResults = results
-        .filter(item => parseFloat(item.iv) > parseFloat(item.price))
-        .sort((a, b) => parseFloat(b.iv) - parseFloat(a.iv));
+        .map()
+        .sort((a, b) => parseFloat(b.iv) - parseFloat(a.price));
 
     await csvWriter.writeRecords(sortedResults);
 
