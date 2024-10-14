@@ -184,7 +184,7 @@ const csvWriter = createCsvWriter({
     });
 
     const chartDataSheet = workbook.addWorksheet('Chart Data');
-    chartDataSheet.addRow(['Category', 'Count']);
+    chartDataSheet.addRow(['Category', '%']);
     chartDataSheet.addRow(['Price < IV', (parseFloat(countBelow * 100) / parseFloat(totalCompanies)).toFixed(2)]);
     chartDataSheet.addRow(['Price >= IV', (parseFloat(countAboveOrEqual * 100) / parseFloat(totalCompanies)).toFixed(2)]);
 

@@ -5,3 +5,4 @@ node_modules/
 /playwright/.cache/
 /package-lock.json
 /results.csv
+/results.xslx
