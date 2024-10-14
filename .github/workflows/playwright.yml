@@ -2,7 +2,7 @@ name: Playwright Tests
 on:
   workflow_dispatch:
   schedule: 
-    - cron: '40 8 * * *'
+    - cron: '44 8 * * *'
     - cron: '0 0 * * *'
 
 jobs:
