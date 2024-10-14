@@ -1,24 +1,25 @@
 const { firefox  } = require('playwright');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const ExcelJS = require('exceljs');
 
 const csvWriter = createCsvWriter({
     path: 'results.csv',
     header: [
-      { id: 'symbol', title: 'Symbol' },
-      { id: 'pe', title: 'P/E' },
-      { id: 'eps', title: 'EPS (ttm)' },
-      { id: 'epsNext5', title: 'EPS next 5Y' },
-      { id: 'price', title: 'Price' },
-      { id: 'eps2', title: 'EPS 2' },
-      { id: 'eps3', title: 'EPS 3' },
-      { id: 'eps4', title: 'EPS 4' },
-      { id: 'eps5', title: 'EPS 5' },
-      { id: 'iv', title: 'IV' },
-      { id: 'iv2', title: 'IV 2' },
-      { id: 'iv3', title: 'IV 3' },
-      { id: 'iv4', title: 'IV 4' },
-      { id: 'iv5', title: 'IV 5' },
-      { id: 'iv30', title: 'IV 30%' },
+      { key: 'symbol', header: 'Symbol' },
+      { key: 'pe', header: 'P/E' },
+      { key: 'eps', header: 'EPS (ttm)' },
+      { key: 'epsNext5', header: 'EPS next 5Y' },
+      { key: 'price', header: 'Price' },
+      { key: 'eps2', header: 'EPS 2' },
+      { key: 'eps3', header: 'EPS 3' },
+      { key: 'eps4', header: 'EPS 4' },
+      { key: 'eps5', header: 'EPS 5' },
+      { key: 'iv', header: 'IV' },
+      { key: 'iv2', header: 'IV 2' },
+      { key: 'iv3', header: 'IV 3' },
+      { key: 'iv4', header: 'IV 4' },
+      { key: 'iv5', header: 'IV 5' },
+      { key: 'iv30', header: 'IV 30%'},
     ]
 });
 
@@ -120,7 +121,75 @@ const csvWriter = createCsvWriter({
      || parseFloat(a.price) - parseFloat(b.price));
 
 
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('New Sheet');
+    worksheet.columns = [
+        { key: 'symbol', header: 'Symbol' },
+        { key: 'pe', header: 'P/E' },
+        { key: 'eps', header: 'EPS (ttm)' },
+        { key: 'epsNext5', header: 'EPS next 5Y' },
+        { key: 'price', header: 'Price' },
+        { key: 'eps2', header: 'EPS 2' },
+        { key: 'eps3', header: 'EPS 3' },
+        { key: 'eps4', header: 'EPS 4' },
+        { key: 'eps5', header: 'EPS 5' },
+        { key: 'iv', header: 'IV' },
+        { key: 'iv2', header: 'IV 2' },
+        { key: 'iv3', header: 'IV 3' },
+        { key: 'iv4', header: 'IV 4' },
+        { key: 'iv5', header: 'IV 5' },
+        { key: 'iv30', header: 'IV 30%' },
+    ];
+
+    let countBelow = 0;
+    let countAboveOrEqual = 0;
+    let totalCompanies = sortedResults.length;
+
+
+    sortedResults.forEach((e) => {
+        const row = worksheet.addRow({
+            symbol: e.symbol, 
+            pe: e.pe,
+            eps: e.eps,
+            epsNext5: e.epsNext5,
+            price: e.price,
+            eps2: e.eps2,
+            eps3: e.eps3,
+            eps4: e.eps4,
+            eps5: e.eps5,
+            iv: e.iv,
+            iv2: e.iv2,
+            iv3: e.iv3,
+            iv4: e.iv4,
+            iv5: e.iv5,
+            iv30: e.iv30
+        });
+
+        if (parseFloat(e.price) < parseFloat(e.iv)) {
+            row.getCell('price').fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF00FF00' } 
+            };
+
+            row.getCell('iv').fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF00FF00' } 
+            };
+            countBelow++;
+        } else {
+            countAboveOrEqual++;
+        }
+    });
+
+    const chartDataSheet = workbook.addWorksheet('Chart Data');
+    chartDataSheet.addRow(['Category', 'Count']);
+    chartDataSheet.addRow(['Price < IV', (parseFloat(countBelow * 100) / parseFloat(totalCompanies)).toFixed(2)]);
+    chartDataSheet.addRow(['Price >= IV', (parseFloat(countAboveOrEqual * 100) / parseFloat(totalCompanies)).toFixed(2)]);
+
     await csvWriter.writeRecords(sortedResults);
+    await workbook.xlsx.writeFile("results.xslx");
 
 })();
 

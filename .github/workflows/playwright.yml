@@ -29,4 +29,11 @@ jobs:
       with:
         name: results-csv
         path: results.csv
-        retention-days: 2  
+        retention-days: 2
+    - name: Upload Excel Results
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: results-excel
+        path: results.xslx
+        retention-days: 2      
