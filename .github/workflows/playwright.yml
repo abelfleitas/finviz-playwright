@@ -35,5 +35,5 @@ jobs:
       if: ${{ !cancelled() }}
       with:
         name: results-excel
-        path: results.xslx
+        path: results.xlsx
         retention-days: 2      
