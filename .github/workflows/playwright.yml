@@ -1,9 +1,6 @@
 name: Playwright Tests
 on:
   workflow_dispatch:
-  schedule: 
-    - cron: '44 8 * * *'
-    - cron: '0 0 * * *'
 
 jobs:
   Finviz:
