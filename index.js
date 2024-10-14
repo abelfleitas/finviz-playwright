@@ -5,21 +5,21 @@ const ExcelJS = require('exceljs');
 const csvWriter = createCsvWriter({
     path: 'results.csv',
     header: [
-      { key: 'symbol', header: 'Symbol' },
-      { key: 'pe', header: 'P/E' },
-      { key: 'eps', header: 'EPS (ttm)' },
-      { key: 'epsNext5', header: 'EPS next 5Y' },
-      { key: 'price', header: 'Price' },
-      { key: 'eps2', header: 'EPS 2' },
-      { key: 'eps3', header: 'EPS 3' },
-      { key: 'eps4', header: 'EPS 4' },
-      { key: 'eps5', header: 'EPS 5' },
-      { key: 'iv', header: 'IV' },
-      { key: 'iv2', header: 'IV 2' },
-      { key: 'iv3', header: 'IV 3' },
-      { key: 'iv4', header: 'IV 4' },
-      { key: 'iv5', header: 'IV 5' },
-      { key: 'iv30', header: 'IV 30%'},
+      { id: 'symbol', title: 'Symbol' },
+      { id: 'pe', title: 'P/E' },
+      { id: 'eps', title: 'EPS (ttm)' },
+      { id: 'epsNext5', title: 'EPS next 5Y' },
+      { id: 'price', title: 'Price' },
+      { id: 'eps2', title: 'EPS 2' },
+      { id: 'eps3', title: 'EPS 3' },
+      { id: 'eps4', title: 'EPS 4' },
+      { id: 'eps5', title: 'EPS 5' },
+      { id: 'iv', title: 'IV' },
+      { id: 'iv2', title: 'IV 2' },
+      { id: 'iv3', title: 'IV 3' },
+      { id: 'iv4', title: 'IV 4' },
+      { id: 'iv5', title: 'IV 5' },
+      { id: 'iv30', title: 'IV 30%'},
     ]
 });
 
@@ -45,8 +45,6 @@ const csvWriter = createCsvWriter({
     while (continuePaging) {
         const url = r === 1 ? symbolsUrl : `${symbolsUrl}&r=${r}`;
         await page.goto(url);
-        //await page.screenshot({ path: 'example.png' });
-
         const currentData = await extractDataFromPage(page);
         
         const hasDuplicates = currentData.some(symbol => allData.has(symbol));
@@ -120,9 +118,24 @@ const csvWriter = createCsvWriter({
     const sortedResults = results.sort((a, b) => parseFloat(b.iv) - parseFloat(a.iv)
      || parseFloat(a.price) - parseFloat(b.price));
 
+    await csvWriter.writeRecords(sortedResults); 
 
+    await generateExcel(sortedResults);
+})();
+
+async function extractDataFromPage(page) {
+    return await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('table.styled-table-new tr')).map(row => {
+        const col = row.querySelector('td a.tab-link');
+        return col ? col.innerText : ''; 
+      }).filter(text => text !== ''); 
+    });
+}
+
+async function generateExcel(dataSet) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('New Sheet');
+    
     worksheet.columns = [
         { key: 'symbol', header: 'Symbol' },
         { key: 'pe', header: 'P/E' },
@@ -143,10 +156,9 @@ const csvWriter = createCsvWriter({
 
     let countBelow = 0;
     let countAboveOrEqual = 0;
-    let totalCompanies = sortedResults.length;
+    let totalCompanies = dataSet.length;
 
-
-    sortedResults.forEach((e) => {
+    dataSet.forEach((e) => {
         const row = worksheet.addRow({
             symbol: e.symbol, 
             pe: e.pe,
@@ -188,17 +200,6 @@ const csvWriter = createCsvWriter({
     chartDataSheet.addRow(['Price < IV', (parseFloat(countBelow * 100) / parseFloat(totalCompanies)).toFixed(2)]);
     chartDataSheet.addRow(['Price >= IV', (parseFloat(countAboveOrEqual * 100) / parseFloat(totalCompanies)).toFixed(2)]);
 
-    await csvWriter.writeRecords(sortedResults);
-    await workbook.xlsx.writeFile("results.xslx");
-
-})();
-
-async function extractDataFromPage(page) {
-    return await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('table.styled-table-new tr')).map(row => {
-        const col = row.querySelector('td a.tab-link');
-        return col ? col.innerText : ''; 
-      }).filter(text => text !== ''); 
-    });
+    await workbook.xlsx.writeFile("results.xlsx");
 }
 
