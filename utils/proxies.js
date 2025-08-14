@@ -5,6 +5,15 @@ async function getProxies() {
     return text.split('\n').map(p => p.trim()).filter(p => p.length > 0);
 }
 
+async function getProxiesList() {
+    const url = 'https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/all/data.json';
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const proxies = data.map(p => `${p.protocol}://${p.ip}:${p.port}`);
+    return proxies;
+}
+
 async function testProxy(proxy) {
     try {
         const browser = await firefox.launch({
@@ -29,5 +38,6 @@ function getRandomProxy(proxies) {
 module.exports = { 
     getProxies, 
     getRandomProxy, 
-    testProxy 
+    testProxy,
+    getProxiesList
 };
