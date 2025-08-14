@@ -65,7 +65,7 @@ const csvWriter = createCsvWriter({
             
             while (continuePaging) {
                 const url = r === 1 ? symbolsUrl : `${symbolsUrl}&r=${r}`;
-                await page.goto(url);
+                await page.goto(url, { timeout: 10000, waitUntil: 'domcontentloaded' });
                 const currentData = await extractDataFromPage(page);
                 
                 const hasDuplicates = currentData.some(symbol => allData.has(symbol));
