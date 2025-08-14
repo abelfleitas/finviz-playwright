@@ -17,7 +17,7 @@ async function getProxiesList() {
 async function testProxy(proxy) {
     try {
         const browser = await firefox.launch({
-            headless: true,
+            headless: false,
             proxy: { server: proxy }
         });
         const context = await browser.newContext();
