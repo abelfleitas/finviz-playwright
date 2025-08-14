@@ -1,5 +1,5 @@
 const { firefox  } = require('playwright');
-const { getProxies, getRandomProxy, testProxy } = require('./utils/proxies');
+const { getProxies, getRandomProxy, getProxiesList, testProxy } = require('./utils/proxies');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const ExcelJS = require('exceljs');
 
@@ -29,7 +29,10 @@ const csvWriter = createCsvWriter({
     const rateOfReturn = 0.15;
     const marginOfSafety = 0.70;
 
-    let proxies = await getProxies();
+    let proxies1 = await getProxies();
+    let proxies2 = await getProxiesList();
+
+    let proxies = [...proxies1, ...proxies2];
     proxies = await Promise.all(proxies.map(async p => (await testProxy(p) ? p : null)));
     proxies = proxies.filter(Boolean);
     console.log(`Valid Proxies:`, proxies.length);
