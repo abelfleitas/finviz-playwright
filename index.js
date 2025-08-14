@@ -1,4 +1,5 @@
 const { firefox  } = require('playwright');
+const { getProxies, getRandomProxy } = require('./utils/proxies');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const ExcelJS = require('exceljs');
 
@@ -23,12 +24,21 @@ const csvWriter = createCsvWriter({
     ]
 });
 
+
 (async () => {
     const rateOfReturn = 0.15;
     const marginOfSafety = 0.70;
 
+    const proxies = await getProxies();
+
     const symbolsUrl = "https://finviz.com/screener.ashx?v=171&f=fa_curratio_o1,fa_debteq_u0.8,fa_eps5years_o10,fa_epsqoq_pos,fa_epsyoy_pos,fa_epsyoy1_pos,fa_estltgrowth_pos,fa_fpe_profitable,fa_grossmargin_o10,fa_netmargin_o10,fa_opermargin_o10,fa_pe_profitable,fa_ps_o1,fa_quickratio_o1,fa_roa_o10,fa_roe_o10,fa_roi_o10,fa_sales5years_o10,fa_salesqoq_pos,geo_usa&ft=4&o=rsi";
-    const browser = await firefox.launch();
+    const proxy = getRandomProxy(proxies);
+    console.log(`proxy: ${proxy}`);
+
+    const browser = await firefox.launch({
+        headless: false,
+        proxy: { server: proxy }
+    });
     const context = await browser.newContext();
 
     const page = await context.newPage({
