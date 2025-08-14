@@ -156,10 +156,12 @@ const csvWriter = createCsvWriter({
 
 async function extractDataFromPage(page) {
     return await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('table.styled-table-new tr')).map(row => {
-        const col = row.querySelector('td a.tab-link');
-        return col ? col.innerText : ''; 
-      }).filter(text => text !== ''); 
+        const rows = Array.from(document.querySelectorAll('table.styled-table-new tr'));
+        if (!rows.length) return [];
+        return rows.map(row => {
+            const col = row.querySelector('td a.tab-link');
+            return col ? col.innerText : ''; 
+        }).filter(text => text !== ''); 
     });
 }
 
