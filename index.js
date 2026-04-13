@@ -47,17 +47,27 @@ const csvWriter = createCsvWriter({
         let browser;
         try {
             browser = await firefox.launch({
-                headless: false,
+                headless: true,
                 proxy: { server: proxy }
             });
-            const context = await browser.newContext();
-
-            const page = await context.newPage({
-                userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-                extraHTTPHeaders: { 
-                    'Cache-Control': 'no-cache' 
-                } 
+            
+            const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+            
+            const context = await browser.newContext({
+                userAgent: userAgent,
+                extraHTTPHeaders: {
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.5',
+                    'Accept-Encoding': 'gzip, deflate',
+                    'DNT': '1',
+                    'Connection': 'keep-alive',
+                    'Upgrade-Insecure-Requests': '1',
+                    'Referer': 'https://finviz.com/'
+                },
+                viewport: { width: 1280, height: 720 }
             });
+
+            const page = await context.newPage();
 
             let allData = new Set(); 
             let r = 1; 
@@ -66,6 +76,10 @@ const csvWriter = createCsvWriter({
             while (continuePaging) {
                 const url = r === 1 ? symbolsUrl : `${symbolsUrl}&r=${r}`;
                 await page.goto(url, { timeout: 10000, waitUntil: 'domcontentloaded' });
+                
+                // Add delay between requests
+                await page.waitForTimeout(2000 + Math.random() * 3000);
+                
                 const currentData = await extractDataFromPage(page);
                 
                 const hasDuplicates = currentData.some(symbol => allData.has(symbol));
@@ -84,6 +98,9 @@ const csvWriter = createCsvWriter({
             for (const symbol of uniqueDataArray) {         
                 console.log(`symbol =>`, symbol); 
                 await page.goto(`https://finviz.com/quote.ashx?t=${symbol}&p=d`);
+                
+                // Add delay between symbol requests
+                await page.waitForTimeout(1500 + Math.random() * 2500);
                 
                 const data = await page.locator(".js-snapshot-table").evaluate(el => {
                     return [...el.querySelectorAll("tbody tr td")].map(td => td.textContent);

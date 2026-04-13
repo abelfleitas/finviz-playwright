@@ -1,3 +1,5 @@
+const { firefox } = require('playwright');
+
 async function getProxies() {
     const url = 'https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&proxy_format=protocolipport&format=text';
     const res = await fetch(url);
@@ -17,15 +19,18 @@ async function getProxiesList() {
 async function testProxy(proxy) {
     try {
         const browser = await firefox.launch({
-            headless: false,
+            headless: true,
             proxy: { server: proxy }
         });
-        const context = await browser.newContext();
+        const context = await browser.newContext({
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        });
         const page = await context.newPage();
-        await page.goto('https://www.google.com', { timeout: 8000 });
+        // Test with Finviz instead of Google to ensure proxy works for target
+        await page.goto('https://finviz.com', { timeout: 5000, waitUntil: 'domcontentloaded' });
         await browser.close();
         return true;
-    } catch {
+    } catch (error) {
         return false; 
     }
 }
